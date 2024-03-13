@@ -1,4 +1,4 @@
-# simple_crud_api_go (WIP)
+# simple_crud_api_go
 
 This is a simple CRUD API written in Go using the [gorilla/mux](https://github.com/gorilla/mux) package
 
