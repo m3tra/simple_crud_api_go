@@ -11,7 +11,7 @@ import (
 )
 
 type Movie struct {
-	ID       int       `json:"id"`
+	ID       uint      `json:"id"`
 	Isbn     string    `json:"isbn"`
 	Title    string    `json:"title"`
 	Director *Director `json:"director"`
@@ -22,8 +22,8 @@ type Director struct {
 	Last_name  string `json:"last_name"`
 }
 
-var currMaxID int = 0
-var movies map[int]Movie
+var currMaxID uint = 0
+var movies map[uint]Movie
 
 func getMovies(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -47,8 +47,13 @@ func getMovie(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		return
 	}
+	if id < 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		log.Println("Negative id provided")
+		return
+	}
 
-	movie, exists := movies[id]
+	movie, exists := movies[uint(id)]
 	if !exists {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -118,7 +123,7 @@ func updateMovie(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	movie, exists := movies[id]
+	movie, exists := movies[uint(id)]
 	if !exists {
 		w.WriteHeader(http.StatusNotFound)
 		return
@@ -164,14 +169,14 @@ func deleteMovie(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	movie, exists := movies[id]
+	movie, exists := movies[uint(id)]
 	if !exists {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
 
 	log.Println(movie)
-	delete(movies, id)
+	delete(movies, uint(id))
 	log.Println("Deleted")
 
 	if err := json.NewEncoder(w).Encode(movies); err != nil {
@@ -180,11 +185,11 @@ func deleteMovie(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	const port int16 = 8080
+	const port uint16 = 8080
 
 	r := mux.NewRouter()
 
-	movies = make(map[int]Movie)
+	movies = make(map[uint]Movie)
 
 	movies[1] = Movie{
 		ID:    1,
